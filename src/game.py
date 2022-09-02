@@ -45,7 +45,7 @@ class GameManager:
         self.game_setup()
 
     def call_invader(self):
-        invader_sprite = Invader(random_point(), self.invaders_ID, self.display_surface)
+        invader_sprite = Invader(random_point(750), self.invaders_ID, self.display_surface)
         self.invaders_ID += 1
         self.invader.add(invader_sprite)
 

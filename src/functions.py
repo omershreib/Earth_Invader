@@ -1,8 +1,8 @@
 from random import randint, choice
 from settings import *
 
-def random_point():
-	excluded_radious = 500
+def random_point(radius):
+	excluded_radious = radius
 
 	# operating the min/max function just for safty
 	min_width = min(screen_width - excluded_radious, screen_width)

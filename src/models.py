@@ -128,22 +128,49 @@ class InvaderBullets(pygame.sprite.Sprite):
         super().__init__()
 
         # define ivader-bullet surface
-        self.image_size = (0, 0, 5, 5)
         self.image = pygame.Surface((8, 8))
         self.image.set_colorkey(COLOR_BLACK)
-        pygame.draw.ellipse(self.image, COLOR_LIME, self.image_size)
+        pygame.draw.circle(self.image, COLOR_LIME, (5,5), 2)
         self.rect = self.image.get_rect()
 
         # define movement
-        self.pos = Vector2(invader_pos)
-        #self.rect.centerx, self.rect.centery = invader_pos
-        self.dircation = Vector2(target).normalize()
-        self.image = pygame.transform.rotate(self.image)
-        self.velocity = 2
+        self.pos = self.x, self.y = invader_pos
+        self.target = target
+        self.velocity = 10
+
+        # killing definitions
+        self.time = time.time()
+        self.time_to_kill = 5
+
+        self.fix_angle()
+
+    def fix_angle(self):
+        vel = self.velocity
+
+        y_diff = self.target[1] - self.y
+        x_diff = self.y - self.target[0]
+
+        angle = math.atan2(y_diff, x_diff)  # angle in radians
+
+        if self.x < self.target[0]:             # invader LEFT to target
+            self.dx = -vel * math.cos(angle)
+            self.dy = vel * math.sin(angle)
+
+        if self.x >= self.target[0]:            # invader RIGHT to target
+            self.dx = vel * math.cos(angle)
+            self.dy = vel * math.sin(angle)
 
     def update(self):
-        self.pos += self.dircation * self.velocity
-        self.rect.center = self.pos
+        vel = self.velocity
+        # self.x and self.y are floats, so the firing movement is more accurate
+        # if converting them to an intagers
+        self.x += int(self.dx)
+        self.y += int(self.dy)
+
+        self.rect.x = int(self.x)
+        self.rect.y = int(self.y)
+
+        self.kill_sprite()
 
     def draw(self, screen):
         screen.blit(self.image, self.pos)
@@ -196,9 +223,6 @@ class InvaderBullets2(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
 
-
-
-
 class Invader(pygame.sprite.Sprite):
     def __init__(self, pos, id, screen):
         super().__init__()
@@ -208,7 +232,8 @@ class Invader(pygame.sprite.Sprite):
         self.image = pygame.transform.smoothscale(image, invader_size).convert_alpha()
         self.oirign_img = self.image
         self.rect = self.image.get_rect(center=pos)
-        self.pos = Vector2(pos)
+        #self.rect = self.image.get_rect(center=(1000,500))
+        #self.pos = Vector2(pos)
         self.target_point = EARTH_POSITION
         self.id = id
         self.surface = screen
@@ -240,7 +265,6 @@ class Invader(pygame.sprite.Sprite):
     def get_position(self):
         return self.rect.centerx, self.rect.centery
 
-
     def fire(self):
         if self.fire_curr_baseline == self.fire_baseline:
             print(f"Invader {self} fire!")
@@ -263,7 +287,6 @@ class Invader(pygame.sprite.Sprite):
         distance = (x_diff**2 + y_diff**2)**0.5
         return distance
 
-
     def move_toward_point(self, point=EARTH_POSITION):
         vel = self.velocity
         distance = self.get_distance_from_point()
@@ -273,14 +296,12 @@ class Invader(pygame.sprite.Sprite):
         movement = define_sprite_movement(vel, distance, self_position, self.target_point, threshold)
         self.rect = self.rect.move(movement)
 
-
     def update(self):
         distance = self.get_distance_from_point()
         if distance > self.dfe_threshold:
             self.move_toward_point()
 
         self.fire()
-
 
     def __str__(self):
         return f"<Invader #{self.id})>"
