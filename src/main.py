@@ -88,7 +88,7 @@ def main():
         screen.blit(background, BACKGROUND_POSITION)
         #pygame.draw.ellipse(screen, (0,255,0),(130, 500, 60, 120))
         game_manager.run()
-        #draw_fire_cross(screen, pygame.mouse.get_pos(), fire_flag, game_manager.is_reload)
+        draw_fire_cross(screen, pygame.mouse.get_pos(), fire_flag, game_manager.is_reload)
         pygame.display.update()
         clock.tick(CLOCK_RATE)
 

@@ -21,7 +21,7 @@ class GameManager:
         # general
         self.display_surface = surface
         self.game_score = 0
-        self.game_hearts = 5
+        self.game_life = 100
         self.max_cannon_shells = 10
 
         # cannon details
@@ -47,13 +47,13 @@ class GameManager:
     def call_invader(self):
         invader_sprite = Invader(random_point(750), self.invaders_ID, self.display_surface)
         self.invaders_ID += 1
-        self.invader.add(invader_sprite)
+        self.invaders.add(invader_sprite)
 
     def game_setup(self):
         self.cannon = Cannon()
         self.earth = pygame.sprite.GroupSingle()
         self.shells = pygame.sprite.Group()
-        self.invader = pygame.sprite.Group()
+        self.invaders = pygame.sprite.Group()
 
 
         earth_sprite = Earth(EARTH_POSITION)
@@ -78,6 +78,11 @@ class GameManager:
         self.update_score()
         self.update_bullets_num()
         self.update_cannon_status()
+        self.update_life_status()
+
+    def update_life_status(self):
+        score_text = self.SCORE_FONT.render(f'LIFE: {self.game_life}', True, COLOR_WHITE)
+        self.display_surface.blit(score_text, SCORE_TEXT_POSOTION)
 
     def update_cannon_status(self):
         if not self.is_cannon_empty:
@@ -96,7 +101,7 @@ class GameManager:
 
     def update_score(self):
         score_text = self.SCORE_FONT.render(f'SCORE: {self.game_score}', True, COLOR_WHITE)
-        self.display_surface.blit(score_text, SCORE_TEXT_POSOTION)
+        self.display_surface.blit(score_text, LIFE_TEXT_POSOTION)
 
     def update_bullets_num(self):
         bullets_num = self.current_shellnum
@@ -135,8 +140,21 @@ class GameManager:
         self.shells.draw(screen)
 
         # invaders
-        self.invader.update()
-        self.invader.draw(screen)
+        self.invaders.update()
+        self.invaders.draw(screen)
+
+        for invader in self.invaders:
+            if pygame.sprite.spritecollide(invader, self.shells, True):
+                invader.is_exploded = True
+
+        if not bullet_hits.empty():
+            if self.game_life > 0:
+                self.game_life -= bullet_hits.get()
+                #print('hit!')
+
+            if self.game_life <= 0:
+                self.game_life = 0
+                #print('dead')
 
         self.display_texts()
 

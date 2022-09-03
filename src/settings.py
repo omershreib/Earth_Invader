@@ -2,7 +2,7 @@ from utilities import get_windows_screen_size
 
 # screen settings
 vertical_tile_number = 11
-invader_size = (64,64)
+scaling_size = (64,64)
 tile_size = 64
 cannon_size = (66*2,9*2)
 
@@ -34,4 +34,5 @@ COLOR_LIME = (0,255,0) # kind of green
 # text positions
 SCORE_TEXT_POSOTION = [screen_width-250,10]
 SHELL_TEXT_POSOTION = [screen_width-250,50]
+LIFE_TEXT_POSOTION = [screen_width-250,90]
 CANNON_STATUS_TEXT_POSOTION = [screen_width-300,screen_height - 70]
