@@ -4,6 +4,7 @@ from sys import exit
 from settings import *
 from game import GameManager
 
+pygame.init()
 BACKGROUND_POSITION = 0,0
 EARTH_POSITION = screen_width/2, screen_height/2
 CANNON_POSITION = screen_width/2, screen_height/2
@@ -40,7 +41,6 @@ def draw_fire_cross(screen, mouse_position, is_fire, is_reloaded):
 
 
 def main():
-    pygame.init()
     screen = pygame.display.set_mode(screen_size)
     print(f"screen size details:\nwidth: {screen_width}, height: {screen_height}")
     clock = pygame.time.Clock()
@@ -51,9 +51,6 @@ def main():
     pygame.display.set_caption('Earth Invaders')
     game_manager = GameManager(screen)
 
-    # tests
-    test_surface = pygame.Surface((16,16))
-    cannon_pivot = pygame.draw.circle(test_surface, COLOR_BLACK, (8,8), 8)
     fire_flag = False
 
     while True:
@@ -82,11 +79,7 @@ def main():
                 if event.key == pygame.K_i:     # add invader
                     game_manager.call_invader()
 
-
-
-        #screen.fill(COLOR_WHITE)
         screen.blit(background, BACKGROUND_POSITION)
-        #pygame.draw.ellipse(screen, (0,255,0),(130, 500, 60, 120))
         game_manager.run()
         draw_fire_cross(screen, pygame.mouse.get_pos(), fire_flag, game_manager.is_reload)
         pygame.display.update()

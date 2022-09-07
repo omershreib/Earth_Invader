@@ -54,7 +54,7 @@ class GameManager:
         self.earth = pygame.sprite.GroupSingle()
         self.shells = pygame.sprite.Group()
         self.invaders = pygame.sprite.Group()
-        self.clouds = Clouds()
+        #self.clouds = Clouds()
 
 
         earth_sprite = Earth(EARTH_POSITION)
@@ -140,8 +140,8 @@ class GameManager:
         self.earth.draw(screen)
 
         # clouds
-        self.clouds.update()
-        self.clouds.draw(screen)
+        #self.clouds.update()
+        #self.clouds.draw(screen)
 
         # shells
         self.shells.draw(screen)
