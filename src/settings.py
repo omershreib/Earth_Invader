@@ -3,6 +3,8 @@ from utilities import get_windows_screen_size
 # screen settings
 vertical_tile_number = 11
 scaling_size = (64,64)
+earth_scale = (128,128)
+clouds_scale = (64,64)
 tile_size = 64
 cannon_size = (66*2,9*2)
 

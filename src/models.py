@@ -13,6 +13,62 @@ import glob
 
 bullet_hits = Queue()
 
+class Clouds(pygame.sprite.Sprite):
+    def __init__(self, pos = EARTH_POSITION):
+        super().__init__()
+
+        # define animation
+        self.animation_assetes = {'idle': []}
+        self.animation_imgpath = '../graphic/img/clouds/'
+        self.animation_baseline = 36
+        self.animation_curr_line = 0
+        self.frame_index = 0
+        self.clock_frames = 6
+        self.last_time = 0
+
+        # import all annimations
+        [self.load_animations(name) for name in self.animation_assetes.keys()]
+
+        # scaling assets
+        for key in self.animation_assetes:
+            for i, asset in enumerate(self.animation_assetes[key]):
+                self.animation_assetes[key][i] = pygame.transform.scale(asset, clouds_scale).convert_alpha()
+
+        # generals
+        self.image = self.animation_assetes['idle'][0]  # idle is the default image
+        self.rect = self.image.get_rect(center=pos)
+
+
+    def load_animations(self, key):
+        img_list = []
+        filepath = self.animation_imgpath + key
+        [img_list.append(pygame.image.load(img).convert_alpha()) for img in glob.glob(f'{filepath}\*.png')]
+
+        self.animation_assetes[key] = img_list
+
+    def idle(self):
+        "while earth is spinning and healthy, until death :|"
+
+        n = len(self.animation_assetes['idle'])
+        if self.frame_index < n:
+            if self.animation_baseline < self.animation_curr_line:
+
+                self.animation_curr_line = 0
+                self.frame_index += 1
+                self.image = self.animation_assetes['idle'][self.frame_index]
+
+        if self.frame_index == n - 1: # restart the animation from the first frame
+            self.frame_index = 0
+
+        self.animation_curr_line += self.clock_frames
+
+    def update(self):
+        self.idle()
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+
+
 
 class Background(pygame.sprite.Sprite):
     def __init__(self, filepath):
@@ -78,8 +134,56 @@ class CannonShell(pygame.sprite.Sprite):
 class Earth(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        self.image = pygame.image.load('../graphic/img/earth/Earth.png').convert_alpha()
+
+        # define animation
+        self.animation_assetes = {'idle': []}
+        self.animation_imgpath = '../graphic/img/earth/'
+        self.animation_baseline = 360
+        self.animation_curr_line = 0
+        self.frame_index = 0
+        self.clock_frames = 3
+        self.last_time = 0
+
+        # import all annimations
+        [self.load_animations(name) for name in self.animation_assetes.keys()]
+
+        # scaling assets
+        for key in self.animation_assetes:
+            for i, asset in enumerate(self.animation_assetes[key]):
+                scaled_asset = pygame.transform.scale(asset, earth_scale).convert_alpha()
+                self.animation_assetes[key][i] = pygame.transform.rotate(scaled_asset, 23.44)
+
+
+        # generals
+        self.image = self.animation_assetes['idle'][0]  # idle is the default image
         self.rect = self.image.get_rect(center = pos)
+
+
+    def load_animations(self, key):
+        img_list = []
+        filepath = self.animation_imgpath + key
+        [img_list.append(pygame.image.load(img).convert_alpha()) for img in glob.glob(f'{filepath}\*.png')]
+
+        self.animation_assetes[key] = img_list
+
+    def idle(self):
+        "while earth is spinning and healthy, until death :|"
+
+        n = len(self.animation_assetes['idle'])
+        if self.frame_index < n:
+            if self.animation_baseline < self.animation_curr_line:
+
+                self.animation_curr_line = 0
+                self.frame_index += 1
+                self.image = self.animation_assetes['idle'][self.frame_index]
+
+        if self.frame_index == n: # restart the animation from the first frame
+            self.frame_index = 0
+
+        self.animation_curr_line += self.clock_frames
+
+    def update(self):
+        self.idle()
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
