@@ -1,3 +1,6 @@
+import os.path
+import sys
+
 import pygame
 import math
 from pygame.math import Vector2
@@ -13,6 +16,19 @@ import re
 
 
 bullet_hits = Queue()
+
+
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def distance(self, other):
+        return ((self.x - other.x)**2 + (self.y - other.y)**2)**0.5
+
+    def __call__(self, *args, **kwargs):
+        return self.x, self.y
+
 
 class Clouds(pygame.sprite.Sprite):
     def __init__(self, pos = EARTH_POSITION):
@@ -84,7 +100,6 @@ class Clouds(pygame.sprite.Sprite):
     def draw(self, surface):
         #if self.is_idle_play:
         surface.blit(self.image, self.rect)
-
 
 
 class Background(pygame.sprite.Sprite):
@@ -177,10 +192,17 @@ class Earth(pygame.sprite.Sprite):
         self.idle_n = len(self.animation_assetes['idle'])
 
     def load_animations(self, key):
+        print(os.path.abspath(__file__))
         img_list = []
         filepath = self.animation_imgpath + key
-        #[img_list.append(pygame.image.load(img).convert_alpha()) for img in glob.glob(f'{filepath}\*.png')]
+        assert os.path.exists(filepath), f"There is a problem with the filepath\n " \
+                                         f"filepath: {os.path.abspath(filepath)}"
+
         [img_list.append(img) for img in glob.glob(f'{filepath}\*.png')]
+
+        assert len(img_list) > 0, f"The annimation didn't been loaded (path issue?)\n" \
+                                   f"filepath: {filepath}"
+
         img_list.sort(key=lambda x: int(re.findall(r'\d+\.png', x)[0].replace('.png', '')))
 
         self.animation_assetes[key] = [pygame.image.load(img).convert_alpha() for img in img_list]
@@ -227,22 +249,16 @@ class Bullets(pygame.sprite.Sprite):
         self.time_to_kill = 5
 
         self.fix_angle()
+        print(f"bullet src: {self.pos}, bullet target: {self.target}")
 
     def fix_angle(self):
         vel = self.velocity
-
         y_diff = self.target[1] - self.y
-        x_diff = self.y - self.target[0]
+        x_diff = self.target[0] - self.x
 
-        angle = math.atan2(y_diff, x_diff)  # angle in radians
-
-        if self.x < self.target[0]:             # invader LEFT to target
-            self.dx = -vel * math.cos(angle)
-            self.dy = vel * math.sin(angle)
-
-        if self.x >= self.target[0]:            # invader RIGHT to target
-            self.dx = vel * math.cos(angle)
-            self.dy = vel * math.sin(angle)
+        angle = math.atan2(y_diff,x_diff)
+        self.dx = vel*math.cos(angle)
+        self.dy = vel*math.sin(angle)
 
     def collision(self, radious = 50):
 
@@ -317,7 +333,7 @@ class Invader(pygame.sprite.Sprite):
         self.bullets = pygame.sprite.Group()
         self.fire_baseline = 100
         self.fire_loading_speed = 5
-        self.fire_curr_baseline = 100
+        self.fire_curr_baseline = 0
 
         # movement
         self.movement_baseline = 100
@@ -334,15 +350,16 @@ class Invader(pygame.sprite.Sprite):
         return self.rect.centerx, self.rect.centery
 
     def fire(self):
+
         baseline = self.fire_baseline
         curr_baseline = self.fire_curr_baseline
-        if curr_baseline == baseline:
-            bullet = Bullets(self.get_position())
+        if curr_baseline >= baseline:
+            bullet = Bullets(self.get_position(), self.target_point)
             self.bullets.add(bullet)
             self.fire_curr_baseline = 0
 
         if curr_baseline < baseline:
-            curr_baseline += self.fire_loading_speed
+            self.fire_curr_baseline += self.fire_loading_speed
 
         self.bullets.update()
         self.bullets.draw(self.surface)
