@@ -40,6 +40,8 @@ COLOR_HIT = (206,241,255)
 
 # text positions
 SCORE_TEXT_POSOTION = [screen_width-250,10]
-SHELL_TEXT_POSOTION = [screen_width-250,50]
-LIFE_TEXT_POSOTION = [screen_width-250,90]
+LIFE_TEXT_POSOTION = [screen_width-250,50]
+SHELL_TEXT_POSOTION = [screen_width-250,90]
+NEXT_WAVE_TEXT_POSITION = [screen_width/2 - 100,10]
+
 CANNON_STATUS_TEXT_POSOTION = [screen_width-300,screen_height - 70]

@@ -54,6 +54,7 @@ class GameManager:
         self.next_summon_level = 2
         self.last_summon = round(time.perf_counter(), self.float_precision)
         self.summon_rate = 5 # summons/sec, summons number is increased
+        self.next_wave = -1
 
     def call_invader(self):
         invader_sprite = Invader(random_point(750), self.invaders_ID, self.display_surface)
@@ -91,9 +92,14 @@ class GameManager:
         self.update_bullets_num()
         self.update_cannon_status()
         self.update_life_status()
+        self.update_next_wave()
+
+    def update_next_wave(self):
+        next_wave = self.SHELL_FONT.render(f'NEXT WAVE: {self.next_wave}', True, COLOR_WHITE)
+        self.display_surface.blit(next_wave, NEXT_WAVE_TEXT_POSITION)
 
     def update_life_status(self):
-        score_text = self.SCORE_FONT.render(f'LIFE: {self.game_life}', True, COLOR_WHITE)
+        score_text = self.SHELL_FONT.render(f'LIFE: {self.game_life}', True, COLOR_WHITE)
         self.display_surface.blit(score_text, SCORE_TEXT_POSOTION)
 
     def update_cannon_status(self):
@@ -112,7 +118,7 @@ class GameManager:
         self.display_surface.blit(cannon_text, CANNON_STATUS_TEXT_POSOTION)
 
     def update_score(self):
-        score_text = self.SCORE_FONT.render(f'SCORE: {self.game_score}', True, COLOR_WHITE)
+        score_text = self.SHELL_FONT.render(f'SCORE: {self.game_score}', True, COLOR_WHITE)
         self.display_surface.blit(score_text, LIFE_TEXT_POSOTION)
 
     def update_bullets_num(self):
@@ -133,7 +139,7 @@ class GameManager:
         screen = self.display_surface
 
         # cannon fire
-        #result = round(time.perf_counter() - self.last_fire, self.float_precision)
+        #result = self.round_time(time.perf_counter(), self.last_fire)
         if self.round_time(time.perf_counter(), self.last_fire) > self.fire_rate:
             if self.is_fire:
                 if not self.is_reload:
@@ -174,7 +180,10 @@ class GameManager:
         if self.round_time(time.perf_counter(), self.last_summon) > self.summon_rate:
             [self.call_invader() for i in range(self.invaders_to_summon)]
             self.invaders_to_summon += self.next_summon_level
+            self.last_summon = self.round_time(time.perf_counter())
             self.summon_rate += 10
+
+        self.next_wave = self.summon_rate - int(self.round_time(time.perf_counter(), self.last_summon))
 
         # invaders update
         self.invaders.update()
@@ -195,7 +204,10 @@ class GameManager:
 
             if self.game_life <= 0:
                 self.game_life = 0
-                #print('dead')
+
+        # update score
+        if not invaders_kill.empty():
+            self.game_score += invaders_kill.get()
 
         self.display_texts()
 
