@@ -18,6 +18,7 @@ import re
 bullet_hits = Queue()
 invaders_kill = Queue()
 
+soundpath = '../graphic/sound/'
 
 class Point:
     def __init__(self, x, y):
@@ -243,6 +244,10 @@ class Earth(pygame.sprite.Sprite):
 class Bullets(pygame.sprite.Sprite):
     def __init__(self, invader_pos, target = EARTH_POSITION):
         super().__init__()
+
+        # sound
+        self.bullet_sound = pygame.mixer.Sound(f'{soundpath}bullet.mp3')
+        self.bullet_sound.play()
 
         # define ivader-bullet surface
         self.image = pygame.Surface((8, 8))

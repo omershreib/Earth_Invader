@@ -5,6 +5,8 @@ from settings import *
 from game import GameManager
 
 pygame.init()
+pygame.mixer.init()
+
 BACKGROUND_POSITION = 0,0
 EARTH_POSITION = screen_width/2, screen_height/2
 CANNON_POSITION = screen_width/2, screen_height/2
