@@ -22,7 +22,7 @@ class GameManager:
         self.display_surface = surface
         self.game_score = 0
         self.game_life = 100
-        self.max_cannon_shells = 10
+        self.max_cannon_shells = 15
 
         # cannon details
         self.is_cannon_empty = False
@@ -32,6 +32,10 @@ class GameManager:
         self.reload_speed = 10 # smaller the number increase reload speed
         self.reload_baseline = 0
         self.cannon_status = 'Ready'
+        self.float_precision = 3
+
+        self.fire_rate = 0.25  # fire/sec
+        self.last_fire = round(time.perf_counter(), self.float_precision)
 
         # font initanilzation
         self.SCORE_FONT = pygame.font.Font(font_path, 40)
@@ -43,6 +47,12 @@ class GameManager:
 
         # setup game sprites
         self.game_setup()
+
+        # invaders comming definition
+        self.invaders_to_summon = 1
+        self.next_summon_level = 2
+        self.last_summon = round(time.perf_counter(), self.float_precision)
+        self.summon_rate = 5 # summons/sec, summons number is increased
 
     def call_invader(self):
         invader_sprite = Invader(random_point(750), self.invaders_ID, self.display_surface)
@@ -109,16 +119,29 @@ class GameManager:
         shell_text = self.SHELL_FONT.render(f'BULLETS: {bullets_num}', True, COLOR_WHITE)
         self.display_surface.blit(shell_text, SHELL_TEXT_POSOTION)
 
+    def round_time(self, *args):
+        n = len(args)
+        fp = self.float_precision
+        if n == 1:
+            return round(args[0], fp)
+
+        if n == 2:
+            return round(abs(args[0] - args[1]), fp)
+
     def run(self):
         screen = self.display_surface
 
         # cannon fire
-        if self.is_fire:
-            if not self.is_reload:
-                # check if cannon in reload process
-                if self.current_shellnum > 0:   # check if there any bullet
-                    self.shells.add(CannonShell(self.cannon))
-                    self.current_shellnum -=1
+        #result = round(time.perf_counter() - self.last_fire, self.float_precision)
+        if self.round_time(time.perf_counter(), self.last_fire) > self.fire_rate:
+            if self.is_fire:
+                if not self.is_reload:
+                    self.last_fire = self.round_time(time.perf_counter())
+
+                    # check if cannon in reload process
+                    if self.current_shellnum > 0:   # check if there any bullet
+                        self.shells.add(CannonShell(self.cannon))
+                        self.current_shellnum -=1
 
         # check if empty
         if self.current_shellnum == 0:
@@ -136,7 +159,7 @@ class GameManager:
         self.cannon.draw(screen)
 
         # earth
-        self.earth.update()
+        self.earth.update(screen)
         self.earth.draw(screen)
 
         # clouds
@@ -146,7 +169,13 @@ class GameManager:
         # shells
         self.shells.draw(screen)
 
-        # invaders
+        # invaders summon
+        if self.round_time(time.perf_counter(), self.last_summon) > self.summon_rate:
+            [self.call_invader() for i in range(self.invaders_to_summon)]
+            self.invaders_to_summon += self.next_summon_level
+            self.summon_rate += 10
+
+        # invaders update
         self.invaders.update()
         self.invaders.draw(screen)
 
@@ -156,7 +185,11 @@ class GameManager:
 
         if not bullet_hits.empty():
             if self.game_life > 0:
-                self.game_life -= bullet_hits.get()
+
+                # play hit animation
+                for e in self.earth:
+                    self.game_life -= bullet_hits.get()
+                    e.hit(screen)
                 #print('hit!')
 
             if self.game_life <= 0:

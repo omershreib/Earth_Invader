@@ -144,7 +144,7 @@ class CannonShell(pygame.sprite.Sprite):
         # define cannon-shell surface
         self.image = pygame.Surface((16, 16))
         self.image.set_colorkey(COLOR_BLACK)
-        pygame.draw.circle(self.image, COLOR_RED, (8, 8), 5)  # red ball
+        pygame.draw.circle(self.image, COLOR_SHELL, (8, 8), 5)  # red ball
         self.rect = self.image.get_rect()
 
         # generals
@@ -191,8 +191,13 @@ class Earth(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = pos)
         self.idle_n = len(self.animation_assetes['idle'])
 
+        # hit animation
+        self.is_hit = False
+        self.hit_baseline = 120
+        self.hit_curr_baseline = 0
+        self.hit_frame_index = 30
+
     def load_animations(self, key):
-        print(os.path.abspath(__file__))
         img_list = []
         filepath = self.animation_imgpath + key
         assert os.path.exists(filepath), f"There is a problem with the filepath\n " \
@@ -221,8 +226,14 @@ class Earth(pygame.sprite.Sprite):
 
         self.animation_curr_line += self.clock_frames
 
-    def update(self):
+    def update(self, surface):
         self.idle()
+
+    def hit(self, surface):
+        delta = 10
+        radius = (self.rect.size[0] / math.pi) + delta
+        pygame.draw.circle(surface, COLOR_HIT, EARTH_POSITION, radius)
+
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
@@ -235,7 +246,7 @@ class Bullets(pygame.sprite.Sprite):
         # define ivader-bullet surface
         self.image = pygame.Surface((8, 8))
         self.image.set_colorkey(COLOR_BLACK)
-        pygame.draw.circle(self.image, COLOR_LIME, (5,5), 2)
+        pygame.draw.circle(self.image, COLOR_BULLET, (5,5), 2)
         self.rect = self.image.get_rect()
         self.damage = 1
 
@@ -269,6 +280,7 @@ class Bullets(pygame.sprite.Sprite):
 
         if self.x in collision_range_x and self.y in collision_range_y:
             bullet_hits.put(self.damage)
+            self.kill()
             #print(f'bullet {self} it!')
 
     def update(self):

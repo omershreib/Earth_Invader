@@ -33,6 +33,11 @@ COLOR_WHITE = (255, 255, 255)
 COLOR_GREY = (105,105,105)
 COLOR_LIME = (0,255,0) # kind of green
 
+# from pallate
+COLOR_BULLET = (143,211,69)
+COLOR_SHELL = (30,64,91)
+COLOR_HIT = (206,241,255)
+
 # text positions
 SCORE_TEXT_POSOTION = [screen_width-250,10]
 SHELL_TEXT_POSOTION = [screen_width-250,50]

@@ -60,12 +60,14 @@ def main():
                 exit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
+                print('need to fire!')
                 if not game_manager.is_cannon_empty:
-                    game_manager.is_fire = True
                     fire_flag = True
 
             if event.type == pygame.MOUSEBUTTONUP:
+                #game_manager.is_fire = False
                 fire_flag = False
+
 
             if event.type == pygame.KEYDOWN:
 
@@ -80,7 +82,9 @@ def main():
                     game_manager.call_invader()
 
         screen.blit(background, BACKGROUND_POSITION)
+        game_manager.is_fire = fire_flag
         game_manager.run()
+
         draw_fire_cross(screen, pygame.mouse.get_pos(), fire_flag, game_manager.is_reload)
         pygame.display.update()
         clock.tick(CLOCK_RATE)
