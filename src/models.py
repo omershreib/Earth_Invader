@@ -270,7 +270,7 @@ class Bullets(pygame.sprite.Sprite):
         self.time_to_kill = 5
 
         self.fix_angle()
-        print(f"bullet src: {self.pos}, bullet target: {self.target}")
+        #print(f"bullet src: {self.pos}, bullet target: {self.target}")
 
     def fix_angle(self):
         vel = self.velocity

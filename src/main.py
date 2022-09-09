@@ -85,7 +85,12 @@ def main():
 
         screen.blit(background, BACKGROUND_POSITION)
         game_manager.is_fire = fire_flag
-        game_manager.run()
+
+        if game_manager.game_life > 0:
+            game_manager.run()
+
+        if game_manager.game_life == 0:
+            game_manager.game_over()
 
         draw_fire_cross(screen, pygame.mouse.get_pos(), fire_flag, game_manager.is_reload)
         pygame.display.update()

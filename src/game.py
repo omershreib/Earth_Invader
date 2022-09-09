@@ -58,6 +58,14 @@ class GameManager:
         self.summon_rate = 5 # summons/sec, summons number is increased
         self.next_wave = -1
 
+    def game_over(self):
+        game_over_text = self.SCORE_FONT.render(f'GAME OVER', True, COLOR_WHITE)
+        self.display_surface.blit(game_over_text, [screen_width/2, screen_height/2 - 25])
+
+        score_text = self.SHELL_FONT.render(f'SCORE: {self.game_score}', True, COLOR_WHITE)
+        self.display_surface.blit(score_text, [screen_width/2, screen_height/2 + 25])
+
+
     def call_invader(self):
         self.wave_num += 1
         for i in  range(self.invaders_to_summon):
