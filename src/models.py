@@ -143,6 +143,10 @@ class CannonShell(pygame.sprite.Sprite):
     def __init__(self, cannon):
         super().__init__()
 
+        # sound
+        self.shell_sound = pygame.mixer.Sound(f'{soundpath}shell.mp3')
+        self.shell_sound.play()
+
         # define cannon-shell surface
         self.image = pygame.Surface((16, 16))
         self.image.set_colorkey(COLOR_BLACK)
@@ -314,6 +318,8 @@ class Invader(pygame.sprite.Sprite):
     def __init__(self, pos, id, screen):
         super().__init__()
 
+        # sound
+        self.explosion_sound = pygame.mixer.Sound(f'{soundpath}invader_exploded.mp3')
         # define animation
         self.animation_assetes = {'idle': [], 'exploded': []}
         self.animation_imgpath = '../graphic/img/invaders/'
@@ -412,6 +418,9 @@ class Invader(pygame.sprite.Sprite):
         n = len(self.animation_assetes['exploded'])
 
         self.image = self.animation_assetes['exploded'][self.frame_index]
+        if self.frame_index == 1:
+            self.explosion_sound.play()
+
         if self.frame_index < n:
             if self.animation_baseline < self.animation_curr_line:
                 self.animation_curr_line = 0
