@@ -16,6 +16,7 @@ import re
 
 
 bullet_hits = Queue()
+invaders_kill = Queue()
 
 
 class Point:
@@ -340,6 +341,7 @@ class Invader(pygame.sprite.Sprite):
         self.vel_baseline = 3
         self.vel_curr_baseline = 0
         self.is_exploded = False
+        self.score = 100
 
         # bullets definitions
         self.bullets = pygame.sprite.Group()
@@ -411,6 +413,7 @@ class Invader(pygame.sprite.Sprite):
                 self.frame_index += 1
 
                 if self.frame_index >= n:   # killing sprite in the end of animation
+                    invaders_kill.put(self.score)   # don't forget to increase score
                     self.kill()
 
             self.animation_curr_line += self.clock_frames

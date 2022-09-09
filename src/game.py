@@ -41,6 +41,7 @@ class GameManager:
         self.SCORE_FONT = pygame.font.Font(font_path, 40)
         self.SHELL_FONT = pygame.font.Font(font_path, 32)
         self.CANNON_STATUS_FONT = pygame.font.Font(font_path, 32)
+        self.LIFT_FONT = pygame.font.Font(font_path, 32)
 
         # invaders stuff
         self.invaders_ID = 1

@@ -67,3 +67,4 @@ def define_sprite_movement(vel, distance,self_point, target_point, threshold = 0
 
 	return (move_x, move_y)
 
+
