@@ -4,7 +4,7 @@ from pygame.math import Vector2
 from settings import *
 from utilities import import_folder
 from math import sin, cos
-from random import randint
+from random import randint, getrandbits
 from functions import random_point, define_sprite_movement
 from multiprocessing import Queue
 import time
@@ -25,7 +25,9 @@ class Clouds(pygame.sprite.Sprite):
         self.animation_curr_line = 0
         self.frame_index = 0
         self.clock_frames = 6
-        self.last_time = 0
+        self.annimation_wait_baseline = 600
+        self.annimation_wait_index = 0
+        self.is_idle_play = False
 
         # import all annimations
         [self.load_animations(name) for name in self.animation_assetes.keys()]
@@ -33,7 +35,7 @@ class Clouds(pygame.sprite.Sprite):
         # scaling assets
         for key in self.animation_assetes:
             for i, asset in enumerate(self.animation_assetes[key]):
-                self.animation_assetes[key][i] = pygame.transform.scale(asset, clouds_scale).convert_alpha()
+                self.animation_assetes[key][i] = pygame.transform.scale(asset, earth_scale).convert_alpha()
 
         # generals
         self.image = self.animation_assetes['idle'][0]  # idle is the default image
@@ -43,9 +45,11 @@ class Clouds(pygame.sprite.Sprite):
     def load_animations(self, key):
         img_list = []
         filepath = self.animation_imgpath + key
-        [img_list.append(pygame.image.load(img).convert_alpha()) for img in glob.glob(f'{filepath}\*.png')]
+        # [img_list.append(pygame.image.load(img).convert_alpha()) for img in glob.glob(f'{filepath}\*.png')]
+        [img_list.append(img) for img in glob.glob(f'{filepath}\*.png')]
+        img_list.sort(key=lambda x: int(re.findall(r'\d+\.png', x)[0].replace('.png', '')))
 
-        self.animation_assetes[key] = img_list
+        self.animation_assetes[key] = [pygame.image.load(img).convert_alpha() for img in img_list]
 
     def idle(self):
         "while earth is spinning and healthy, until death :|"
@@ -59,14 +63,26 @@ class Clouds(pygame.sprite.Sprite):
                 self.image = self.animation_assetes['idle'][self.frame_index]
 
         if self.frame_index == n - 1: # restart the animation from the first frame
+            self.is_idle_play = False
             self.frame_index = 0
 
         self.animation_curr_line += self.clock_frames
 
     def update(self):
+        # playing the clouds animation at a random time
+        # hopfullty this will provide more realistice image of earth
         self.idle()
+        
+        # if self.annimation_wait_baseline <= self.annimation_wait_index:
+        #     self.is_idle_play = True
+        #     self.annimation_wait_index = 0
+        #
+        # if self.annimation_wait_baseline > self.annimation_wait_index:
+        #     self.annimation_wait_index += 1
+
 
     def draw(self, surface):
+        #if self.is_idle_play:
         surface.blit(self.image, self.rect)
 
 
@@ -142,7 +158,7 @@ class Earth(pygame.sprite.Sprite):
         self.animation_baseline = 360
         self.animation_curr_line = 0
         self.frame_index = 1
-        self.clock_frames = 60
+        self.clock_frames = 30
         self.last_time = 0
 
         # import all annimations
@@ -160,7 +176,6 @@ class Earth(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = pos)
         self.idle_n = len(self.animation_assetes['idle'])
 
-
     def load_animations(self, key):
         img_list = []
         filepath = self.animation_imgpath + key
@@ -172,9 +187,7 @@ class Earth(pygame.sprite.Sprite):
 
     def idle(self):
         "while earth is spinning and healthy, until death :|"
-        print(self.animation_assetes)
         n = self.idle_n
-        print(f"frame index: {self.frame_index}, curr line: {self.animation_curr_line}")
         if self.animation_baseline == self.animation_curr_line:
             if self.frame_index < n:
                 self.animation_curr_line = 0
