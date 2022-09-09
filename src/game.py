@@ -60,7 +60,10 @@ class GameManager:
 
     def call_invader(self):
         self.wave_num += 1
-        [Invader(random_point(750), self.invaders_ID, self.display_surface) for i in range(self.invaders_to_summon)]
+        for i in  range(self.invaders_to_summon):
+            invader_sprite = Invader(random_point(750), self.invaders_ID, self.display_surface)
+            self.invaders.add(invader_sprite)
+
         self.invaders_to_summon += self.next_summon_level
         self.last_summon = self.round_time(time.perf_counter())
         self.summon_rate += 5
@@ -99,6 +102,11 @@ class GameManager:
         self.update_cannon_status()
         self.update_life_status()
         self.update_next_wave()
+        self.update_wave_num()
+
+    def update_wave_num(self):
+        wave_num = self.SHELL_FONT.render(f'#WAVE: {self.wave_num}', True, COLOR_WHITE)
+        self.display_surface.blit(wave_num, WAVW_NUM_TEXT_POSITION)
 
     def update_next_wave(self):
         next_wave = self.SHELL_FONT.render(f'NEXT WAVE: {self.next_wave}', True, COLOR_WHITE)
@@ -186,7 +194,8 @@ class GameManager:
         self.next_wave = self.summon_rate - int(self.round_time(time.perf_counter(), self.last_summon))
         if self.is_ready and self.wave_num > 0:
             self.game_score += self.next_wave * self.wave_num
-
+            self.is_ready = False
+            self.call_invader()
 
         if self.round_time(time.perf_counter(), self.last_summon) > self.summon_rate:
             self.call_invader()
