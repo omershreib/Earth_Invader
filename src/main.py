@@ -70,7 +70,6 @@ def main():
                 #game_manager.is_fire = False
                 fire_flag = False
 
-
             if event.type == pygame.KEYDOWN:
 
                 if event.key == pygame.K_q:     # exit the game
@@ -80,8 +79,9 @@ def main():
                 if event.key == pygame.K_r:     # reload cannon
                     game_manager.reload_cannon()
 
-                if event.key == pygame.K_i:     # add invader
-                    game_manager.call_invader()
+
+                if event.key == pygame.K_n:     # call invader wave before time
+                    game_manager.is_ready = True
 
         screen.blit(background, BACKGROUND_POSITION)
         game_manager.is_fire = fire_flag

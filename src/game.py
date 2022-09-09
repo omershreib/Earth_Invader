@@ -29,6 +29,8 @@ class GameManager:
         self.current_shellnum = self.max_cannon_shells
         self.is_fire = False
         self.is_reload = False
+        self.is_ready = False # player ready for the next invader wave (increase score)
+        self.wave_num = 0
         self.reload_speed = 10 # smaller the number increase reload speed
         self.reload_baseline = 0
         self.cannon_status = 'Ready'
@@ -57,7 +59,11 @@ class GameManager:
         self.next_wave = -1
 
     def call_invader(self):
-        invader_sprite = Invader(random_point(750), self.invaders_ID, self.display_surface)
+        self.wave_num += 1
+        [Invader(random_point(750), self.invaders_ID, self.display_surface) for i in range(self.invaders_to_summon)]
+        self.invaders_to_summon += self.next_summon_level
+        self.last_summon = self.round_time(time.perf_counter())
+        self.summon_rate += 5
         self.invaders_ID += 1
         self.invaders.add(invader_sprite)
 
@@ -177,13 +183,15 @@ class GameManager:
         self.shells.draw(screen)
 
         # invaders summon
-        if self.round_time(time.perf_counter(), self.last_summon) > self.summon_rate:
-            [self.call_invader() for i in range(self.invaders_to_summon)]
-            self.invaders_to_summon += self.next_summon_level
-            self.last_summon = self.round_time(time.perf_counter())
-            self.summon_rate += 10
-
         self.next_wave = self.summon_rate - int(self.round_time(time.perf_counter(), self.last_summon))
+        if self.is_ready and self.wave_num > 0:
+            self.game_score += self.next_wave * self.wave_num
+
+
+        if self.round_time(time.perf_counter(), self.last_summon) > self.summon_rate:
+            self.call_invader()
+
+
 
         # invaders update
         self.invaders.update()
