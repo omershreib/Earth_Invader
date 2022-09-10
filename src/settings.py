@@ -20,6 +20,7 @@ background_color = 'blue'
 background_path = '../graphic/background/nebula.jpg'
 font_path = '../graphic/font/VCR_OSD_MONO_1.001.ttf'
 CLOCK_RATE = 30
+BACKGROUND_POSITION = 0,0
 
 # sprites positions
 EARTH_POSITION = screen_width/2, screen_height/2

@@ -201,7 +201,7 @@ class GameManager(TextDisplay, Level):
             self.reload_cannon()
 
         self.shells.update()
-        self.is_fire = False
+        #self.is_fire = False
 
         # cannon
         self.cannon.update(pygame.mouse.get_pos())
