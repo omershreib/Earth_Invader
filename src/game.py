@@ -14,9 +14,6 @@ from functions import *
 SCORE_TEXT = "SCORE:"
 SHELL_TEXT = "BULLETS:"
 
-#SCORE_FONT = pygame.font.Font(font_path, 40)
-#SHELL_FONT = pygame.font.Font(font_path, 32)
-
 
 class Level:
     def __init__(self):
