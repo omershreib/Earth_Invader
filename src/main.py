@@ -47,25 +47,16 @@ def main():
     pygame.display.set_caption('Earth Invaders')
     game_manager = GameManager(screen)
 
-
+    # game loop
     while True:
-
         event_listener(game_manager)
-
         screen.blit(background, BACKGROUND_POSITION)
         draw_fire_cross(screen, pygame.mouse.get_pos(), game_manager.is_fire, game_manager.is_reload)
 
-        if game_manager.game_life > 0:
-            game_manager.run()
-
-        if game_manager.game_life == 0:
-            game_manager.game_over()
-
-
+        game_manager.start()
         pygame.display.update()
         clock.tick(CLOCK_RATE)
 
-        #print(pygame.mouse.get_pos())
 
 if __name__ == '__main__':
     main()

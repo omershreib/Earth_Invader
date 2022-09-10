@@ -178,6 +178,13 @@ class GameManager(TextDisplay, Level):
         if n == 2:
             return round(abs(args[0] - args[1]), fp)
 
+    def start(self):
+        if self.game_life > 0:
+            self.run()
+
+        if self.game_life == 0:
+            self.game_over()
+
     def run(self):
         screen = self.display_surface
 

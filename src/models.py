@@ -1,8 +1,4 @@
-import os.path
-import sys
-
-import pygame
-import math
+from pygame.sprite import Sprite as pg
 from pygame.math import Vector2
 from settings import *
 from utilities import import_folder
@@ -10,15 +6,30 @@ from math import sin, cos
 from random import randint, getrandbits
 from functions import random_point, define_sprite_movement
 from multiprocessing import Queue
+import pygame
+import math
 import time
 import glob
 import re
+import os.path
+import sys
 
 
 bullet_hits = Queue()
 invaders_kill = Queue()
 
 soundpath = '../graphic/sound/'
+
+class KillSprite:
+    def __init__(self):
+        # killing definitions
+        self.time = time.time()
+        self.time_to_kill = 5
+
+    def kill_sprite(self):
+        if time.time() - self.time > self.time_to_kill:
+            self.kill()
+
 
 class Point:
     def __init__(self, x, y):
@@ -32,7 +43,7 @@ class Point:
         return self.x, self.y
 
 
-class Clouds(pygame.sprite.Sprite):
+class Clouds(pg):
     def __init__(self, pos = EARTH_POSITION):
         super().__init__()
 
@@ -104,7 +115,7 @@ class Clouds(pygame.sprite.Sprite):
         surface.blit(self.image, self.rect)
 
 
-class Background(pygame.sprite.Sprite):
+class Background(pg):
     def __init__(self, filepath):
         super().__init__()
         self.image = pygame.image.load(background_path)
@@ -113,7 +124,7 @@ class Background(pygame.sprite.Sprite):
         self.rect.top = 0
 
 
-class Cannon(pygame.sprite.Sprite):
+class Cannon(pg):
     def __init__(self):
         image = pygame.image.load('../graphic/img/cannon/Cannon2.png').convert_alpha()
         self.cannonIm = pygame.transform.smoothscale(image, cannon_size).convert_alpha()
@@ -139,7 +150,7 @@ class Cannon(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
 
-class CannonShell(pygame.sprite.Sprite):
+class CannonShell(pg, KillSprite):
     def __init__(self, cannon):
         super().__init__()
 
@@ -164,12 +175,17 @@ class CannonShell(pygame.sprite.Sprite):
             (cannon.pivot[0] + barrelLen * cos(self.radAngle),
              cannon.pivot[1] - barrelLen * sin(self.radAngle))
 
+        self.time = time.time()
+        self.time_to_kill = 5
+
     def update(self):
         vel = self.velocity
         self.rect = self.rect.move(vel * cos(self.radAngle), -vel * sin(self.radAngle)) # fire
 
+        self.kill_sprite()
 
-class Earth(pygame.sprite.Sprite):
+
+class Earth(pg):
     def __init__(self, pos):
         super().__init__()
 
@@ -245,7 +261,7 @@ class Earth(pygame.sprite.Sprite):
         surface.blit(self.image, self.rect)
 
 
-class Bullets(pygame.sprite.Sprite):
+class Bullets(pg, KillSprite):
     def __init__(self, invader_pos, target = EARTH_POSITION):
         super().__init__()
 
@@ -270,7 +286,6 @@ class Bullets(pygame.sprite.Sprite):
         self.time_to_kill = 5
 
         self.fix_angle()
-        #print(f"bullet src: {self.pos}, bullet target: {self.target}")
 
     def fix_angle(self):
         vel = self.velocity
@@ -309,12 +324,7 @@ class Bullets(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.pos)
 
-    def kill_sprite(self):
-        if time.time() - self.time > self.time_to_kill:
-            self.kill()
-
-
-class Invader(pygame.sprite.Sprite):
+class Invader(pg):
     def __init__(self, pos, id, screen):
         super().__init__()
 
